@@ -80,7 +80,7 @@
 			this.TSOpenFileBtn.Image = ((System.Drawing.Image)(resources.GetObject("TSOpenFileBtn.Image")));
 			this.TSOpenFileBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.TSOpenFileBtn.Name = "TSOpenFileBtn";
-			this.TSOpenFileBtn.Size = new System.Drawing.Size(29, 25);
+			this.TSOpenFileBtn.Size = new System.Drawing.Size(29, 28);
 			this.TSOpenFileBtn.Text = "Open Existing File";
 			this.TSOpenFileBtn.ToolTipText = "Opens an open file dialog to select an existing file";
 			this.TSOpenFileBtn.Click += new System.EventHandler(this.TSOpenFileBtn_Click);
@@ -91,7 +91,7 @@
 			this.TSSaveBtn.Image = ((System.Drawing.Image)(resources.GetObject("TSSaveBtn.Image")));
 			this.TSSaveBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.TSSaveBtn.Name = "TSSaveBtn";
-			this.TSSaveBtn.Size = new System.Drawing.Size(29, 25);
+			this.TSSaveBtn.Size = new System.Drawing.Size(29, 28);
 			this.TSSaveBtn.Text = "Save File";
 			this.TSSaveBtn.ToolTipText = "Save the current design to a file";
 			this.TSSaveBtn.Click += new System.EventHandler(this.TSSaveBtn_Click);
@@ -102,7 +102,7 @@
 			this.TSSaveAsBtn.Image = ((System.Drawing.Image)(resources.GetObject("TSSaveAsBtn.Image")));
 			this.TSSaveAsBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.TSSaveAsBtn.Name = "TSSaveAsBtn";
-			this.TSSaveAsBtn.Size = new System.Drawing.Size(29, 25);
+			this.TSSaveAsBtn.Size = new System.Drawing.Size(29, 28);
 			this.TSSaveAsBtn.Text = "Save Design As...";
 			this.TSSaveAsBtn.ToolTipText = "Opens a file save dialog to save the current design to a new file";
 			this.TSSaveAsBtn.Click += new System.EventHandler(this.TSSaveAsBtn_Click);
@@ -116,22 +116,23 @@
 			this.TSReloadBtn.Size = new System.Drawing.Size(29, 25);
 			this.TSReloadBtn.Text = "Reload Design";
 			this.TSReloadBtn.ToolTipText = "Reloads the current design from the design file";
+			this.TSReloadBtn.Click += new System.EventHandler(this.TSReloadBtn_Click);
 			// 
 			// toolStripSeparator1
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(6, 28);
+			this.toolStripSeparator1.Size = new System.Drawing.Size(6, 31);
 			// 
 			// toolStripLabel1
 			// 
 			this.toolStripLabel1.Name = "toolStripLabel1";
-			this.toolStripLabel1.Size = new System.Drawing.Size(82, 25);
+			this.toolStripLabel1.Size = new System.Drawing.Size(82, 28);
 			this.toolStripLabel1.Text = "Design File";
 			// 
 			// TSDesignFileCbx
 			// 
 			this.TSDesignFileCbx.Name = "TSDesignFileCbx";
-			this.TSDesignFileCbx.Size = new System.Drawing.Size(400, 28);
+			this.TSDesignFileCbx.Size = new System.Drawing.Size(400, 31);
 			this.TSDesignFileCbx.ToolTipText = "The current design file";
 			this.TSDesignFileCbx.SelectedIndexChanged += new System.EventHandler(this.TSDesignFileCbx_SelectedIndexChanged);
 			// 

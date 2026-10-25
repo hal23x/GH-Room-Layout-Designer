@@ -1,6 +1,13 @@
 
 # GH Room Layout Designer
 
+A Windows Forms based room layout designer.  This is a re-write to the GWHCAD program, taking advantage of multiple document interface (MDI), storing design files as JSON, and allowing full creation and object property updates from the UI.
+
+## Repository Structure
+
+The repository directory and file structure is as follows.
+
+
 ## Conversion from GHX2DCAD
 
 Corresponding Objects between projects:

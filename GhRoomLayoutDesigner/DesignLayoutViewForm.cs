@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -69,11 +70,41 @@ namespace GhRoomLayoutDesigner
 
 			DesignLayoutViewControl.DesignData = DesignFile.LoadDesignFile(filepath);
 			DocumentFormStatusUpdate?.Invoke(this, $"Opened design file \"{filepath}\"");
+			Text = Path.GetFileName(filepath);
 
 			return true;
 		}
 
 
+		/// <summary>
+		/// Reloads the current design file from disk when a valid file path is available.
+		/// </summary>
+		/// <remarks>Updates the design data and form title after a successful reload. Raises a status update message
+		/// for both successful reload and missing file scenarios.</remarks>
+		public void ReloadDesignFile()
+		{
+			string filepath = DesignLayoutViewControl.DesignData?.FileName;
+
+			if (!string.IsNullOrEmpty(filepath) && File.Exists(filepath))
+			{
+				DesignLayoutViewControl.DesignData = DesignFile.LoadDesignFile(filepath);
+				DocumentFormStatusUpdate?.Invoke(this, $"Reloaded design file \"{filepath}\"");
+				Text = Path.GetFileName(filepath);
+				DesignLayoutViewControl.ResetViewParameters();
+			}
+			else
+			{
+				DocumentFormStatusUpdate?.Invoke(this, "No file selected to reload");
+			}
+		}
+
+
+		/// <summary>
+		/// Saves the current design file for the loaded design data.
+		/// </summary>
+		/// <remarks>Raises a status update message indicating success, failure, or missing design data. On success,
+		/// updates the form title to the saved file name.</remarks>
+		/// <returns><see langword="true"/> when the design file is saved successfully; otherwise, <see langword="false"/>.</returns>
 		public bool SaveDesignFile()
 		{
 			bool retVal = false;
@@ -89,6 +120,8 @@ namespace GhRoomLayoutDesigner
 				if (DesignLayoutViewControl.DesignData.SaveDesignFile())
 				{
 					DocumentFormStatusUpdate?.Invoke(this, $"Saved design file \"{filename}\"");
+					Text = Path.GetFileName(DesignLayoutViewControl.DesignData.FileName);
+
 					retVal = true;
 				}
 				else
@@ -146,7 +179,6 @@ namespace GhRoomLayoutDesigner
 		/// <param name="designObject">The design object that was selected.</param>
 		private void DesignObjectSelectionHandler(DesignObject designObject)
 		{
-
 			SetSelectedItem(designObject);
 			DocumentFormStatusUpdate?.Invoke(this, designObject != null ? $"Selected: {designObject.Name}" : "No object selected");
 		}
@@ -154,8 +186,9 @@ namespace GhRoomLayoutDesigner
 
 		private void DesignObjectTitleChangedHandler(DesignObject designObject, string newTitle)
 		{
-			DocumentFormTitleChanged?.Invoke(this, newTitle);
-			Text = newTitle;
+			string formTitle = Path.GetFileName(DesignLayoutViewControl.DesignData?.FileName ?? string.Empty);
+			DocumentFormTitleChanged?.Invoke(this, formTitle);
+			Text = formTitle + (DesignLayoutViewControl.DesignData?.Modified == true ? " [Modified]" : string.Empty);
 		}
 
 
@@ -252,6 +285,8 @@ namespace GhRoomLayoutDesigner
 		}
 		#endregion
 
+
+		#region Event Handlers
 		private void TSPropertiesPanelBtn_Click(object sender, EventArgs e)
 		{
 			if (DesignObjectPropertyGrid.Visible)
@@ -270,15 +305,6 @@ namespace GhRoomLayoutDesigner
 			}
 		}
 
-		//private void TSAddFurnitureBtn_Click(object sender, EventArgs e)
-		//{
-		//	DesignLayoutViewControl.AddNewFurnitureObject();
-		//}
-
-		//private void TSRemoveFurnitureBtn_Click(object sender, EventArgs e)
-		//{
-		//	DesignLayoutViewControl.RemoveSelectedFurnitureObject();
-		//}
 
 		private void TSAddNewFurnitureMenuItem_Click(object sender, EventArgs e)
 		{
@@ -299,5 +325,35 @@ namespace GhRoomLayoutDesigner
 		{
 			DesignLayoutViewControl.RemoveSelectedFixtureObject();
 		}
+
+
+		/// <summary>
+		/// Handles the form's closing event by checking for unsaved design changes, prompting to save, and canceling closure
+		/// when needed.
+		/// </summary>
+		/// <remarks>If unsaved changes exist, a confirmation prompt is shown. Choosing to save attempts to persist
+		/// the design and cancels closing if saving fails. Choosing Cancel also cancels closing.</remarks>
+		/// <param name="sender">The source of the event.</param>
+		/// <param name="e">Provides data for the form closing event, including a value that determines whether the close operation is
+		/// canceled.</param>
+		private void DesignLayoutViewForm_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			if (DesignLayoutViewControl.DesignData?.Modified == true)
+			{
+				DialogResult result = MessageBox.Show($"The design file \"{Text}\" has unsaved changes. Do you want to save before closing?", "Unsaved Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+				if (result == DialogResult.Yes)
+				{
+					if (!SaveDesignFile())
+					{
+						e.Cancel = true; // Cancel closing if save failed
+					}
+				}
+				else if (result == DialogResult.Cancel)
+				{
+					e.Cancel = true; // Cancel closing
+				}
+			}
+		}
+		#endregion
 	}
 }

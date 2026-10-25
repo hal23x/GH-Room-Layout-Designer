@@ -143,6 +143,11 @@ namespace GhRoomLayoutDesigner
 		}
 
 
+		/// <summary>
+		/// Creates a <see cref="Graphics"/> object for <c>ParentControl</c> and stores it in <c>GraphicsContext</c>.
+		/// </summary>
+		/// <remarks>Dispose the returned <see cref="Graphics"/> object when it is no longer needed.</remarks>
+		/// <returns>The <see cref="Graphics"/> instance created for <c>ParentControl</c>.</returns>
 		public Graphics CreateGraphicsContext()
 		{
 			GraphicsContext = ParentControl.CreateGraphics();
@@ -150,6 +155,13 @@ namespace GhRoomLayoutDesigner
 		}
 
 
+		/// <summary>
+		/// Projects the design object to display coordinates, draws its polygon outline, and renders its name centered on the
+		/// object when available.
+		/// </summary>
+		/// <remarks>Uses the selected-line pen when the object is selected; otherwise uses the default line pen. Name
+		/// placement is centered at the calculated midpoint and adjusted by the current scale and scroll offsets.</remarks>
+		/// <param name="designObject">Design object to project and draw, including display points, selection state, and optional name.</param>
 		public void DrawObject(DesignObject designObject)
 		{
 			ProjectObject(designObject);
@@ -284,18 +296,14 @@ namespace GhRoomLayoutDesigner
 					designObject.DisplayPoints = new PointF[pointsCnt];
 				}
 
-				// GWH DEBUG--
-				//System.Diagnostics.Debug.WriteLine(Environment.TickCount.ToString() + ":  tranforming object " + designObject.Name + ", perimeter stored array size: " + designObject.PerimeterPoints.Length.ToString() + ", pointsBase size: " + pointsBase.Length.ToString() + ", object draw points size: " + designObject.DisplayPoints.Length.ToString());
-				// --GWH DEBUG
 				foreach (PointF currPt in pointsBase)
 				{
 					double ptDistance = Math.Sqrt((currPt.X * currPt.X) + (currPt.Y * currPt.Y));
 					double currAngle = ptDistance == 0.0F ? 0.0F : CorrectAngleQuadrant(currPt.X, currPt.Y, Math.Asin(Math.Abs(currPt.Y / ptDistance))) + orientation;
+
 					designObject.DisplayPoints[pointNdx].X = (((float)(ptDistance * Math.Cos(currAngle)) + midpoint.X) * Scale) + ScrollOffsetX;
 					designObject.DisplayPoints[pointNdx].Y = (((float)(0.0F - (ptDistance * Math.Sin(currAngle))) + midpoint.Y) * Scale) + ScrollOffsetY;
-					// GWH DEBUG--
-					//System.Diagnostics.Debug.WriteLine(Environment.TickCount.ToString() + ":  point transform:  " + currPt.ToString() + " -> " + designObject.DisplayPoints[pointNdx].ToString());
-					// --GWH DEBUG
+
 					pointNdx++;
 				}
 			}

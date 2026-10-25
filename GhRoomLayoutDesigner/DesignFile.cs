@@ -20,6 +20,7 @@ namespace GhRoomLayoutDesigner
 		[JsonPropertyName("furniture")]
 		public List<DesignObject> Furniture { get; set; } = new List<DesignObject>();
 		public string FileName { get; set; } = string.Empty;
+		public bool Modified { get; set; } = false;
 		#endregion
 
 
@@ -69,6 +70,7 @@ namespace GhRoomLayoutDesigner
 				string fileText = File.ReadAllText(filename);
 				designFile = JsonSerializer.Deserialize<DesignFile>(fileText);
 				designFile.PrepareDesignObjects();
+				designFile.Modified = false;
 				designFile.FileName = filename;
 			}
 			catch (Exception ex)
@@ -80,16 +82,21 @@ namespace GhRoomLayoutDesigner
 
 			return designFile;
 		}
+		#endregion
 
 
+		#region Public Instance Methods
 		/// <summary>
 		/// Saves the current DesignFile to a JSON file.
 		/// </summary>
 		/// <returns>True if the file was successfully saved; otherwise, false.</returns>
 		public bool SaveDesignFile()
 		{
+			bool isModified = Modified;
+
 			try
 			{
+				Modified = false;
 				string jsonString = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
 				File.WriteAllText(FileName, jsonString);
 				return true;
@@ -98,6 +105,7 @@ namespace GhRoomLayoutDesigner
 			{
 				System.Diagnostics.Debug.WriteLine(ex.Message);
 				LastErrorValue = ex.ToString();
+				Modified = isModified;
 				return false;
 			}
 		}

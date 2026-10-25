@@ -18,18 +18,26 @@ namespace GhRoomLayoutDesigner
 
 	public partial class DesignLayoutView : UserControl
 	{
+		#region Public Events
 		public DesignObjectSelectionEventHandler DesignObjectSelectionEvent;
 		public DesignObjectTitleChangedEventHandler DesignObjectTitleChangedEvent;
 		public DesignObjectPropertyChangedEventHandler DesignObjectPropertyChangedEvent;
 		public LayoutViewScaleChangedEventHandler LayoutViewScaleChangedEvent;
+		#endregion
 
+
+		#region Public Properties
 		public DesignFile DesignData { get; set; }
+		#endregion
 
+
+		#region Private Properties
 		private FigureDrawing2D FigureDrawing { get; set; }
 		private bool ControlKeyPressed { get; set; } = false;
 		private Point LastMouseCoords = Point.Empty;
-		private bool Modified { get; set; } = false;
+		//private bool Modified { get; set; } = false;
 		private DesignObject CurrentSelectedObject { get; set; } = null;
+		#endregion
 
 
 		#region Constructor
@@ -143,6 +151,21 @@ namespace GhRoomLayoutDesigner
 
 
 		/// <summary>
+		/// Resets figure drawing parameters and scaling, resets scroll bars, refreshes the view, and raises the layout view
+		/// scale changed event with the current scale relative to the base scale.
+		/// </summary>
+		/// <remarks>The scale changed event is invoked only when there are subscribers.</remarks>
+		public void ResetViewParameters()
+		{
+			FigureDrawing.ResetParameters();
+			FigureDrawing.ResetScaling();
+			ResetScrollBars();
+			Invalidate();
+			LayoutViewScaleChangedEvent?.Invoke(FigureDrawing.Scale / FigureDrawing.BaseScale);
+		}
+
+
+		/// <summary>
 		/// Sets the specified design object as selected.
 		/// </summary>
 		/// <param name="designObject">The design object to set as selected.</param>
@@ -242,29 +265,17 @@ namespace GhRoomLayoutDesigner
 		/// <param name="e">A PaintEventArgs that contains the event data.</param>
 		private void DesignLayoutView_Paint(object sender, PaintEventArgs e)
 		{
-			// GWH DEBUG--
-			System.Diagnostics.Debug.WriteLine(Environment.TickCount.ToString() + ":  DesignLayoutView_Paint called");
-			// --GWH DEBUG
 			FigureDrawing.BeginPaint(e.Graphics);
 
 			if (DesignData != null)
 			{
-				// GWH DEBUG--
-				System.Diagnostics.Debug.WriteLine(Environment.TickCount.ToString() + ":  DesignLayoutView_Paint drawing design data");
-				// --GWH DEBUG
 				if (DesignData.BaseObject != null)
 				{
-					// GWH DEBUG--
-					System.Diagnostics.Debug.WriteLine(Environment.TickCount.ToString() + ":  DesignLayoutView_Paint drawing base object");
-					// --GWH DEBUG
 					FigureDrawing.DrawObject(DesignData.BaseObject);
 				}
 
 				if (DesignData.BaseFixtures != null)
 				{
-					// GWH DEBUG--
-					System.Diagnostics.Debug.WriteLine(Environment.TickCount.ToString() + ":  DesignLayoutView_Paint drawing base fixtures (" + DesignData.BaseFixtures.Count + " total)");
-					// --GWH DEBUG
 					foreach (DesignObject fixture in DesignData.BaseFixtures)
 					{
 						FigureDrawing.DrawObject(fixture);
@@ -273,9 +284,6 @@ namespace GhRoomLayoutDesigner
 
 				if (DesignData.Furniture != null)
 				{
-					// GWH DEBUG--
-					System.Diagnostics.Debug.WriteLine(Environment.TickCount.ToString() + ":  DesignLayoutView_Paint drawing furniture (" + DesignData.Furniture.Count + " total)");
-					// --GWH DEBUG
 					foreach (DesignObject furniture in DesignData.Furniture)
 					{
 						FigureDrawing.DrawObject(furniture);
@@ -354,19 +362,25 @@ namespace GhRoomLayoutDesigner
 			{
 				if (CurrentSelectedObject != null && !CurrentSelectedObject.IsFixed)
 				{
-					float deltaX = (e.X - LastMouseCoords.X) / FigureDrawing.Scale;
-					float deltaY = (e.Y - LastMouseCoords.Y) / FigureDrawing.Scale;
+					int xDiff = e.X - LastMouseCoords.X;
+					int yDiff = e.Y - LastMouseCoords.Y;
 
-					CurrentSelectedObject.MoveObject(deltaX, deltaY);
-					DesignObjectPropertyChangedEvent?.Invoke(CurrentSelectedObject);
-
-					if (!Modified)
+					if (xDiff != 0 || yDiff != 0)
 					{
-						Modified = true;
-						DesignObjectTitleChangedEvent?.Invoke(CurrentSelectedObject, CurrentSelectedObject.Name + " *");
-					}
+						float deltaX = xDiff / FigureDrawing.Scale;
+						float deltaY = yDiff / FigureDrawing.Scale;
 
-					forceRedraw = true;
+						CurrentSelectedObject.MoveObject(deltaX, deltaY);
+						DesignObjectPropertyChangedEvent?.Invoke(CurrentSelectedObject);
+
+						if (!DesignData.Modified)
+						{
+							DesignData.Modified = true;
+							DesignObjectTitleChangedEvent?.Invoke(CurrentSelectedObject, CurrentSelectedObject.Name);
+						}
+
+						forceRedraw = true;
+					}
 				}
 			}
 
@@ -431,10 +445,10 @@ namespace GhRoomLayoutDesigner
 				{
 					selectedObject.RotateObject((e.Delta / 120) * FigureDrawing2D.RotateIncrement);
 
-					if (!Modified)
+					if (!DesignData.Modified)
 					{
-						Modified = true;
-						DesignObjectTitleChangedEvent?.Invoke(selectedObject, selectedObject.Name + " *");
+						DesignData.Modified = true;
+						DesignObjectTitleChangedEvent?.Invoke(selectedObject, selectedObject.Name);
 					}
 
 					DesignObjectPropertyChangedEvent?.Invoke(selectedObject);

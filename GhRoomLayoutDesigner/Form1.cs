@@ -40,7 +40,7 @@ namespace GhRoomLayoutDesigner
 			{
 				filepath = GetNextDesignLayoutViewFormName();
 			}
-			string titleText = System.IO.Path.GetFileName(filepath);
+			string titleText = Path.GetFileName(filepath);
 			DesignLayoutViewForm dlv = new DesignLayoutViewForm {
 				MdiParent = this,
 				Text = titleText
@@ -257,6 +257,24 @@ namespace GhRoomLayoutDesigner
 			if (selectedChild != null)
 			{
 				selectedChild.Activate();
+			}
+		}
+
+
+		/// <summary>
+		/// Handles the Reload button click by reloading the design file in the active MDI child when it is a
+		/// DesignLayoutViewForm.
+		/// </summary>
+		/// <remarks>Reload occurs only when the active MDI child can be cast to DesignLayoutViewForm.</remarks>
+		/// <param name="sender">The object that raised the event.</param>
+		/// <param name="e">Event data associated with the click event.</param>
+		private void TSReloadBtn_Click(object sender, EventArgs e)
+		{
+			DesignLayoutViewForm activeForm = ActiveMdiChild as DesignLayoutViewForm;
+
+			if (activeForm != null)
+			{
+				activeForm.ReloadDesignFile();
 			}
 		}
 		#endregion

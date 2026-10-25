@@ -90,7 +90,7 @@
             this.TSPropertiesPanelBtn});
 			this.DesignLayoutViewTS.Location = new System.Drawing.Point(0, 0);
 			this.DesignLayoutViewTS.Name = "DesignLayoutViewTS";
-			this.DesignLayoutViewTS.Size = new System.Drawing.Size(800, 27);
+			this.DesignLayoutViewTS.Size = new System.Drawing.Size(800, 31);
 			this.DesignLayoutViewTS.TabIndex = 6;
 			this.DesignLayoutViewTS.Text = "toolStrip1";
 			// 
@@ -100,7 +100,7 @@
 			this.TSZoomInBtn.Image = ((System.Drawing.Image)(resources.GetObject("TSZoomInBtn.Image")));
 			this.TSZoomInBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.TSZoomInBtn.Name = "TSZoomInBtn";
-			this.TSZoomInBtn.Size = new System.Drawing.Size(29, 24);
+			this.TSZoomInBtn.Size = new System.Drawing.Size(29, 28);
 			this.TSZoomInBtn.Text = "Zoom In";
 			this.TSZoomInBtn.ToolTipText = "Zoom in";
 			this.TSZoomInBtn.Click += new System.EventHandler(this.TSZoomInBtn_Click);
@@ -233,6 +233,7 @@
 			this.Name = "DesignLayoutViewForm";
 			this.Text = "Design Layout View";
 			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DesignLayoutViewForm_FormClosing);
 			this.PropertiesPnl.ResumeLayout(false);
 			this.DesignLayoutViewTS.ResumeLayout(false);
 			this.DesignLayoutViewTS.PerformLayout();
